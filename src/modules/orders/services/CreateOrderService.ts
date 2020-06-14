@@ -41,6 +41,28 @@ class CreateOrderService {
       products,
     );
 
+    if (allProductsDataById.length !== products.length)
+      throw new AppError('One or more of the specified products do not exist');
+
+    const [{ quantity: newQuantity }] = products;
+    const [{ quantity }] = allProductsDataById;
+
+    if (quantity < newQuantity) {
+      throw new AppError(
+        'You are requesting more quantity that we current have',
+        400,
+      );
+    }
+
+    if (!allProductsDataById) {
+      throw new AppError('This product does not exists!', 400);
+    }
+
+    // change quantity
+    for (let i = 0; i < allProductsDataById.length; i += 1) {
+      allProductsDataById[i].quantity = products[i].quantity;
+    }
+
     const order = await this.ordersRepository.create({
       customer,
       products: allProductsDataById.map(product => {
@@ -51,6 +73,8 @@ class CreateOrderService {
         };
       }),
     });
+
+    await this.productsRepository.updateQuantity(products);
 
     return order;
   }

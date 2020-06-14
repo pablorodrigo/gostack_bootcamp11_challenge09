@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 
 import CreateOrderService from '@modules/orders/services/CreateOrderService';
 import FindOrderService from '@modules/orders/services/FindOrderService';
+import { classToClass } from 'class-transformer';
 
 export default class OrdersController {
   public async show(request: Request, response: Response): Promise<Response> {
@@ -14,6 +15,10 @@ export default class OrdersController {
     const order = await showOrder.execute({ id: order_id });
 
     return response.json(order);
+    /* return response.json({
+      customer: classToClass(order?.customer),
+      order_products: classToClass(order?.order_products),
+    }); */
   }
 
   public async create(request: Request, response: Response): Promise<Response> {
@@ -21,8 +26,11 @@ export default class OrdersController {
 
     const createOrders = container.resolve(CreateOrderService);
 
-    const orders = await createOrders.execute({ customer_id, products });
+    const order = await createOrders.execute({
+      customer_id,
+      products,
+    });
 
-    return response.json(orders);
+    return response.json(order);
   }
 }
