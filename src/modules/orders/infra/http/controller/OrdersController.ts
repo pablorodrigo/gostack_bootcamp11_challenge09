@@ -6,11 +6,15 @@ import CreateOrderService from '@modules/orders/services/CreateOrderService';
 import FindOrderService from '@modules/orders/services/FindOrderService';
 
 export default class OrdersController {
-  public async show(request: Request, response: Response): Promise<Response> {
-    // TODO
-  }
+  public async show(request: Request, response: Response): Promise<Response> {}
 
   public async create(request: Request, response: Response): Promise<Response> {
-    // TODO
+    const { customer_id, products } = request.body;
+
+    const createOrders = container.resolve(CreateOrderService);
+
+    const orders = await createOrders.execute({ customer_id, products });
+
+    return response.json(orders);
   }
 }
